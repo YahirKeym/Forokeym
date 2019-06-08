@@ -15,6 +15,11 @@ class portalForo
      */
     private $cUrlArchivosBase = "";
     /**
+     * $cTemplate Save template in use
+     * @var string
+     */
+    private $cTemplate = "";
+    /**
      * $aBaseFiles Guardara los archivos base que usaremos
      * @var array
      */
@@ -33,16 +38,17 @@ class portalForo
      * __construct Hará la configuración necesaria para que todo funcione. Configurara el template que se usara, la conexión, etc
      * @param array $aConfiguracion Base de datos de configuración provisional.
      */
-    public function __construct($aConfiguracion = [])
+    public function __construct($aConfiguration = [])
     {
-        $this->cUrlArchivosBase = dirname(dirname(dirname(__FILE__))) . '/templates/' . $aConfiguracion['configtemplate'].'/';
-        require_once $this->cUrlArchivosBase . 'portal.template.php';
+    	$this->cTemplate = $aConfiguration['configtemplate'];
+        $this->cUrlArchivosBase = dirname(dirname(dirname(__FILE__))) . '/templates/' . $this->cTemplate;
+        require_once $this->cUrlArchivosBase . '/portal.template.php';
         $this->oPortalHtml = new portalForoHtml();
     }
     public function getHeader()
     {
         $cCssNamePack = $this->createPackData($this->aCssElements, "css");
-        return $this->oPortalHtml->headerHtml("Forokeym");
+        return $this->oPortalHtml->headerHtml("Forokeym","",$cCssNamePack,$this->cTemplate);
     }
     public function getFooter()
     {
@@ -64,11 +70,22 @@ class portalForo
     {
 
     }
+    /**
+     * createPackData Creara los paquetes de recursos con los datos que le digamos
+     * @param  array  $aFiles     Son los archivos externos a los archivos base de ocupamos
+     * @param  string $cTypeFiles Será el tipo de archivo que ocuparemos
+     * @return string             Regresa el sha1 que se creo
+     */
     private function createPackData($aFiles = [], $cTypeFiles = "")
     {
         $this->selectBaseFiles($cTypeFiles);
         $cCodificacion = $this->createShaPack($aFiles, $cTypeFiles);
-        $this->extractDataFiles($this->aBaseFiles,$cTypeFiles);
+        $cBaseFilesContent = $this->extractDataFiles($this->aBaseFiles,$cTypeFiles);
+        $cUrl = $this->cUrlArchivosBase.'/assets/packs/'.$cCodificacion.'.'.$cTypeFiles;
+        file_put_contents($cUrl, $cBaseFilesContent, LOCK_EX);
+        $cExternalFilesContent = $this->extractDataFiles($aFiles,$cTypeFiles);
+        file_put_contents($cUrl, $cExternalFilesContent, FILE_APPEND | LOCK_EX);
+        return $cCodificacion;
     }
     /**
      * extractDataFiles Extraera el contenido de los archivos para poder agregarlos al archivo pack
@@ -80,7 +97,7 @@ class portalForo
     {
     	$cContenido = "";
     	foreach ($aFiles as $cArchivos) {
-    		$cRutaArchivo = $this->cUrlArchivosBase.'assets/'.$cTypeFiles.'/'.$cArchivos.'.'.$cTypeFiles;
+    		$cRutaArchivo = $this->cUrlArchivosBase.'/assets/'.$cTypeFiles.'/'.$cArchivos.'.'.$cTypeFiles;
     		 $cContenido .= file_get_contents($cRutaArchivo, true);
     	}
     	return $cContenido;

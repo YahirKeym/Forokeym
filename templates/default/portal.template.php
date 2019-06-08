@@ -5,7 +5,7 @@
 class portalForoHtml
 {
 	
-	public function headerHtml($cTitulo = "",$cMetaTags = "",$cStyleSheets = "")
+	public function headerHtml($cTitulo = "",$cMetaTags = "",$cStyleSheets = "",$cTemplate = "")
 	{
 		return <<<code
 <!DOCTYPE html>
@@ -13,10 +13,10 @@ class portalForoHtml
 		<head>
 			<title>{$cTitulo}</title>
 			{$cMetaTags}
-			{$cStyleSheets}
+			<link rel="stylesheet" type="text/css" href="templates/{$cTemplate}/assets/pack/{$cStyleSheets}.css" />
 		</head>
 		<body>
-		<h1>HOLA</h1>	
+		<h1 class="">HOLAs</h1>	
 code;
 	}
 	public function footerHtml()
