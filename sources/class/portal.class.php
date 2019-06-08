@@ -70,11 +70,17 @@ class portalForo
         $cCodificacion = $this->createShaPack($aFiles, $cTypeFiles);
         $this->extractDataFiles($this->aBaseFiles,$cTypeFiles);
     }
+    /**
+     * extractDataFiles Extraera el contenido de los archivos para poder agregarlos al archivo pack
+     * @param  array  $aFiles     Serán los archivos externos
+     * @param  string $cTypeFiles Será el tipo de archivo que se manejara
+     * @return string             Regresa el contenido de los archivos en una sola variable
+     */
     private function extractDataFiles($aFiles = [],$cTypeFiles = "")
     {
     	$cContenido = "";
-    	foreach ($aFiles as $cArchivosBase) {
-    		$cRutaArchivo = $this->cUrlArchivosBase.'assets/'.$cTypeFiles.'/'.$cArchivosBase.'.'.$cTypeFiles;
+    	foreach ($aFiles as $cArchivos) {
+    		$cRutaArchivo = $this->cUrlArchivosBase.'assets/'.$cTypeFiles.'/'.$cArchivos.'.'.$cTypeFiles;
     		 $cContenido .= file_get_contents($cRutaArchivo, true);
     	}
     	return $cContenido;
