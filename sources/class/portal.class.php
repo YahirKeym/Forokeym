@@ -30,6 +30,11 @@ class portalForo
      */
     private $aCssElements = [];
     /**
+     * $aScriptElements Guardara los archivos de script
+     * @var array
+     */
+    private $aScriptElements = [];
+    /**
      * $oPortalHtml Será el objeto que guardara el html principal del portal
      * @var object
      */
@@ -45,7 +50,12 @@ class portalForo
         require_once $this->cUrlArchivosBase . '/portal.template.php';
         $this->oPortalHtml = new portalForoHtml();
     }
-    public function getHeader()
+    /**
+     * getHeader Nos traera el header armado mediante los elementos que le solicitemos
+     * @param  string $cHeaderElements Son elementos que se quieran agregar de más al header. Ejemp: <meta name="description" content="prueba" />
+     * @return [type]                  [description]
+     */
+    public function getHeader($cHeaderElements = "")
     {
         $cCssNamePack = $this->createPackData($this->aCssElements, "css");
         return $this->oPortalHtml->headerHtml("Forokeym","",$cCssNamePack,$this->cTemplate);
@@ -54,21 +64,17 @@ class portalForo
     {
 
     }
-    public function addMetaElement()
-    {
-
-    }
     /**
      * addCssElement Agregara los archivos css que necesitemos y le pidamos
-     * @param string $cCssElement Será el archivo css que le mandaremos o agregaremos
+     * @param string $cCssElement Será el archivo css que le mandaremos o agregaremos. Solo el nombre del archivo sin extensión. Ejem: "main","nuevocss". La extensión se agregara por defecto, en este caso .css
      */
     public function addCssElement($cCssElement = "")
     {
-        $this->aCssElements[$cCssElement] = [];
+        array_push($this->aCssElements,$cCssElement);
     }
-    public function addScriptElement()
+    public function addScriptElement($cScriptElement = "")
     {
-
+        array_push($this->aScriptElements);
     }
     /**
      * createPackData Creara los paquetes de recursos con los datos que le digamos
@@ -104,8 +110,7 @@ class portalForo
     }
     /**
      * selectBaseFiles Seleccionaremos los archivos base dependiendo del tipo de archivos que le pidamos
-     * @param  string $cTypeFiles [description]
-     * @return [type]             [description]
+     * @param  string $cTypeFiles Es el tipo de archivo que se pedira de base. css/js
      */
     private function selectBaseFiles($cTypeFiles = "")
     {
@@ -130,8 +135,7 @@ class portalForo
         foreach ($this->aBaseFiles as $archivosBase) {
             $cNombreSha .= $archivosBase . "." . $cTypeFiles;
         }
-        $cNameFiles = array_keys($aFiles);
-        foreach ($cNameFiles as $archivosAgregados) {
+        foreach ($aFiles as $archivosAgregados) {
             $cNombreSha .= $archivosAgregados . "." . $cTypeFiles;
         }
         return sha1($cNombreSha);
